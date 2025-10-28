@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Portal - Complaint System</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-nav">
+            <button id="pending-btn" onclick="showPendingComplaints()" class="nav-btn active">Pending Complaints</button>
+            <button id="resolved-btn" onclick="showResolvedComplaints()" class="nav-btn">Resolved Complaints</button>
+            <button id="all-btn" onclick="showAllComplaints()" class="nav-btn">All Complaints</button>
+        </div>
+        
+        <div id="complaints-section">
+            <h3 id="complaints-title">Pending Complaints</h3>
+            <div id="complaints-list">Loading...</div>
+        </div>
+
+        <div id="dashboard-stats"></div>
+    </div>
+    <script src="../../apis/api.js"></script>
+    <script src="admin.js"></script>
+</body>
+</html>

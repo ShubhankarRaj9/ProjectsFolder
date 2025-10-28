@@ -1,0 +1,107 @@
+/* style.css */
+
+/* Define variables for easy maintenance */
+:root {
+    --primary-color: #3b82f6; /* Blue */
+    --secondary-color: #6c757d; /* Gray */
+    --text-primary: #1e1e2f;
+    --bg-secondary: #f7faff; /* Light background for the form card */
+    --shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+/* Form Container - Replaces: background, padding, border-radius, box-shadow, margin */
+.form-card {
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 0.5rem;
+    box-shadow: var(--shadow);
+    margin: 1rem auto; /* Center the form slightly */
+    max-width: 700px;
+}
+
+/* Form Header - Replaces: display: flex, justify-content, align-items, margin-bottom */
+.form-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+/* Title */
+.form-title {
+    color: var(--text-primary); 
+    margin: 0 !important; /* Overrides any default h2 margin */
+    font-size: 1.5rem;
+}
+
+/* Back Button */
+.btn-back {
+    background: var(--secondary-color);
+    color: white;
+    border: none;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.btn-back:hover {
+    background: #5a6268;
+}
+
+/* Form Layout - Replaces: display: flex, flex-direction: column, gap */
+.form-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+/* Input Group Label */
+.form-group-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+    font-weight: 500;
+}
+
+/* Text/Textarea Inputs */
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ddd;
+    border-radius: 0.25rem;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--primary-color);
+    outline: none;
+}
+.form-textarea {
+    resize: vertical;
+}
+
+/* File Input */
+.form-file-input {
+    /* Basic styling to ensure it fits nicely */
+    padding: 0.5rem 0;
+}
+
+
+/* Submit Button */
+.btn-submit {
+    background: #28a745; /* Green for submit */
+    color: white;
+    border: none;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    margin-top: 1rem;
+    transition: background-color 0.2s;
+}
+.btn-submit:hover {
+    background: #218838;
+}

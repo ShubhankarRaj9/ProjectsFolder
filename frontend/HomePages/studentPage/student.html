@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Portal - Complaint System</title>
+    <link rel="stylesheet" href="student.css">
+</head>
+<body>
+    <div class="header">
+        <img src="iiitbgp.png" alt="IIIT BGP Logo">
+        <h1>Student Complaint Portal</h1>
+        <button onclick="logout()">Logout</button>
+    </div>
+
+    <div class="dashboard-nav">
+        <button id="categories-btn" onclick="showCategories()" class="nav-btn active">Submit Complaint</button>
+        <button id="my-complaints-btn" onclick="showMyComplaints()" class="nav-btn">My Complaints</button>
+    </div>
+
+    <div id="categories-section" class="categories">
+        <h2>Select Complaint Category</h2>
+        <div class="category-grid">
+            <div class="category-card" onclick="showComplaintSection('Academic Issues')">
+                <img src="academic.png" alt="Academic" class="category-icon">
+                <h3>Academic</h3>
+                <p>Issues related to courses, exams, grades</p>
+            </div>
+            <div class="category-card" onclick="showComplaintSection('Infrasturcture Problems')">
+                <img src="infrastructure.png" alt="Infrastructure" class="category-icon">
+                <h3>Infrastructure</h3>
+                <p>Hostel, library, lab facilities</p>
+            </div>
+            <div class="category-card" onclick="showComplaintSection('Administration Complaints')">
+                <img src="administrative.png" alt="Administrative" class="category-icon">
+                <h3>Administrative</h3>
+                <p>Fee, documentation, registration</p>
+            </div>
+            <div class="category-card" onclick="showComplaintSection('Technical Difficulties')">
+                <img src="technical.png" alt="Technical" class="category-icon">
+                <h3>Technical</h3>
+                <p>IT support, software, hardware</p>
+            </div>
+            <div class="category-card" onclick="showComplaintSection('Other Issues')">
+                <img src="other.png" alt="Other" class="category-icon">
+                <h3>Other</h3>
+                <p>General complaints and suggestions</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="submit-complaint-form" class="content" style="display: none;">
+        <!-- Complaint form will be inserted here -->
+    </div>
+
+    <div id="complaint-list" class="content" style="display: none;">
+        <h2>My Complaints</h2>
+        <div id="complaints-container" class="complaints-grid">Loading...</div>
+    </div>
+
+    <script src="../../apis/api.js"></script>
+    <script src="student.js"></script>
+</body>
+</html>

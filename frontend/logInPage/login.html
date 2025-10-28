@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LogIn - Page</title>
+    <link rel="stylesheet" href="login.css">
+</head>
+<body class="LogIn-page">
+    <div class="LogIn-container">
+        <div class="LogIn-box">
+            <h2>Login</h2>
+            <p>Access your complaint portal</p>
+            
+            <div id="message"></div>
+            
+            <form id="loginForm" onsubmit="return false;">
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button type="button" onclick="handleLogin(event)">Login</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <p>Don't have an account? <a href="../SignInPage/SignIn.html" style="color: var(--primary-color); text-decoration: none;">Register here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../apis/api.js"></script>
+    <script src="logIn.js"></script>
+</body>
+</html>

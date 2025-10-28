@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SignIn Page</title>
+    <link rel="stylesheet" href="SignIn.css">
+</head>
+<body class="SignIn-page">
+    <div class="SignIn-container">
+        <div class="SignIn-box">
+            <h2>Register</h2>
+            <p>Create your account to access the complaint portal</p>
+            
+            <div id="message"></div>
+            
+            <form id="registerForm" onsubmit="return false;">
+                <input type="text" id="name" placeholder="Full Name" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="password" id="password" placeholder="Password" required>
+                <input type="password" id="confirmPassword" placeholder="Confirm Password" required>
+                <select id="role" required>
+                    <option value="">Select Role</option>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty</option>
+                    <option value="admin">Admin</option>
+                </select>
+                <button type="button" onclick="handleRegister(event)">Register</button>
+            </form>
+            
+            <div style="text-align: center; margin-top: 1rem;">
+                <p>Already have an account? <a href="../logInPage/login.html" style="color: var(--primary-color); text-decoration: none;">Login here</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../apis/api.js"></script>
+    <script src="../logInPage/logIn.js"></script>
+</body>
+</html>
