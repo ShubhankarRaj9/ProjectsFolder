@@ -109,9 +109,9 @@ A full-stack web application for managing student complaints in an educational i
    ```
    Create a .env file with:
    ```env
-   PORT=4000
-   DATABASE_URL=mongodb://localhost:27017/complaintDatabase
-   JWT_SECRET=complaint_portal_secret_key_2024_secure
+   PORT=xxxx
+   DATABASE_URL= database
+   JWT_SECRET=secret Key
    ```
 
 4. Frontend Setup:
