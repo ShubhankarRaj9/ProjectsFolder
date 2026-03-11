@@ -34,9 +34,9 @@ app.use(express.static(path.join(__dirname, '../frontend')));
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/logInPage/login.html'));
 });
-app.get('/favicon.ico', (req, res) => {
-    res.status(204).end();
-});
+// app.get('/favicon.ico', (req, res) => {
+//     res.status(204).end();
+// });
 
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev'));
