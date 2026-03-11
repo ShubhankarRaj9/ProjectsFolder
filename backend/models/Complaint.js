@@ -19,11 +19,12 @@ const complaintSchema = new mongoose.Schema({
   category: {
     type: String,
     enum: [
-      'Academic Issues',
-      'Infrasturcture Problems',
-      'Administration Complaints',
-      'Technical Difficulties',
-      'Other Issues',
+    'Academic Issues',
+    'Hostel Complaints',
+    'Mess Issues',
+    'Library Concerns',
+    'Other Issues',
+    'IT Support'
     ],
     required: true,
   },
