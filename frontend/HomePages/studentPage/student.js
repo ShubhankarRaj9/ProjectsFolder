@@ -1,5 +1,3 @@
-/* --- GLOBAL REFERENCES --- */
-// Use the ID from your updated HTML structure: 'submit-complaint-form'
 const SUBMIT_FORM_CONTAINER_ID = 'submit-complaint-form';
 const CATEGORIES_SECTION_ID = 'categories-section';
 const COMPLAINT_LIST_ID = 'complaint-list';
@@ -113,7 +111,7 @@ window.submitComplaint = async function(event, category) {
         
         setTimeout(() => {
             messageDiv.remove();
-            showMyComplaints(); // Show complaints list after submission
+           showMyComplaints(); // Show complaints list after submission
         }, 2000);
         
     } catch (error) {
@@ -131,10 +129,6 @@ window.submitComplaint = async function(event, category) {
     }
 };
 
-/* --- The rest of the JS code (logout, DOMContentLoaded, isStudentAuthenticated, loadMyComplaints, deleteComplaint) is mostly fine and should be kept as is. --- */
-
-// --- FIX/IMPROVEMENT for createComplaintForm ---
-// NOTE: I've updated the form to use the proper ID structure for the back button and form submission.
 
 function createComplaintForm(category) {
     return `
