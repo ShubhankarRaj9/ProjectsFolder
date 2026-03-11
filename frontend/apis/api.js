@@ -1,5 +1,5 @@
 // API Configuration and Authentication
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = '/api';
 
 // Token management
 const getToken = () => localStorage.getItem('token') || localStorage.getItem('authToken');
@@ -27,18 +27,18 @@ const apiRequest = async (endpoint, options = {}) => {
         },
         ...options,
     };
-    if(options.body instanceof FormData){
+    if (options.body instanceof FormData) {
         delete config.headers['Content-Type']; // Let browser set it for FormData
     }
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
         const data = await response.json();
-        
+
         if (!response.ok) {
             throw new Error(data.message || 'API request failed');
         }
-        
+
         return data;
     } catch (error) {
         console.error('API Error:', error);
@@ -49,23 +49,23 @@ const apiRequest = async (endpoint, options = {}) => {
 // Authentication API calls
 const authAPI = {
     login: async (email, password) => {
-    const response = await apiRequest('/auth/login', {
-        method: 'POST',
-        body: JSON.stringify({ instituteEmailId: email, password }),
-    });
+        const response = await apiRequest('/auth/login', {
+            method: 'POST',
+            body: JSON.stringify({ instituteEmailId: email, password }),
+        });
 
-    if (response.token) {
-        // Save token
-        setToken(response.token);
+        if (response.token) {
+            // Save token
+            setToken(response.token);
 
-        // Save user details if backend sends them
-        if (response.user) {
-            localStorage.setItem("userId", response.user._id || "");
-            localStorage.setItem("userName", response.user.name || response.user.instituteEmailId||"");
-            localStorage.setItem("userRole", response.user.role || "");
+            // Save user details if backend sends them
+            if (response.user) {
+                localStorage.setItem("userId", response.user._id || "");
+                localStorage.setItem("userName", response.user.name || response.user.instituteEmailId || "");
+                localStorage.setItem("userRole", response.user.role || "");
+            }
         }
-    }
-    return response;
+        return response;
     },
 
     register: async (name, email, password, role) => {
@@ -73,11 +73,11 @@ const authAPI = {
             method: 'POST',
             body: JSON.stringify({ name, instituteEmailId: email, password, role }),
         });
-        
+
         if (response.token) {
             setToken(response.token);
         }
-        
+
         return response;
     },
 
@@ -99,19 +99,26 @@ const complaintAPI = {
             body: formData, // FormData for file upload
         });
 
-        const data = await response.json();
-        
+        let data;
+
+        try {
+            data = await response.json();
+        } catch {
+            data = {};
+        }
+
         if (!response.ok) {
+            console.error("Server response:", data);
             throw new Error(data.message || 'Failed to submit complaint');
         }
-        
+
         return data;
     },
 
     getMyComplaints: async (page = 1, limit = 10, status = '') => {
         const params = new URLSearchParams({ page, limit });
         if (status) params.append('status', status);
-        
+
         return await apiRequest(`/complaints/my-complaints?${params}`);
     },
 
@@ -180,9 +187,9 @@ if (typeof window.showMessage === 'undefined') {
             z-index: 1000;
             background-color: ${type === 'error' ? '#dc3545' : type === 'success' ? '#28a745' : '#007bff'};
         `;
-        
+
         document.body.appendChild(messageDiv);
-        
+
         setTimeout(() => {
             messageDiv.remove();
         }, 3000);
