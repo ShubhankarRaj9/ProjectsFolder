@@ -1,4 +1,5 @@
 const express = require('express');
+const path = require("path");
 const app = express();
 const PORT = process.env.PORT || 3000;
 const mongoose = require('mongoose');
@@ -29,9 +30,9 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-auth-token']
 }));
 
-app.use(express.static('../'));
+app.use(express.static(path.join(__dirname, '../frontend')));
 app.get('/', (req, res) => {
-    res.redirect('/login.html');
+    res.sendFile(path.join(__dirname, '../frontend/logInPage/login.html'));
 });
 app.get('/favicon.ico', (req, res) => {
     res.status(204).end();
