@@ -15,11 +15,11 @@ const mapComplaintResponse = (complaint) => ({
   createdAt: complaint.createdAt,
   resolvedBy: complaint.resolvedBy ? complaint.resolvedBy._id : null,
   resolutionNotes: complaint.resolutionNotes,
-  student: {
+  student: complaint.student && complaint.student._id ? {
     _id: complaint.student._id,
     name: complaint.student.name,
     instituteEmailId: complaint.student.instituteEmailId,
-  },
+  } : null,
 });
 
 const allowedCategories = [
@@ -68,7 +68,7 @@ exports.submitComplaint = asyncHandler(async (req, res) => {
   await newComplaint.save();
   res.status(201).json({
     message: 'Complaint submitted successfully',
-    complaint: mapComplaintResponse(newComplaint),
+    complaint: newComplaint,
   });
 });
 
