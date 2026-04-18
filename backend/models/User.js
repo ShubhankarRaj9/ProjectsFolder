@@ -19,7 +19,11 @@ const userSchema = new mongoose.Schema({
     enum: ["student", "admin", "faculty"],
     default: "student",
   },
-  
+  refreshTokens: {
+    type: [String],
+    default: []
+  },
+
 }, { timestamps: true });
 
 module.exports = mongoose.model("User", userSchema);

@@ -1,3 +1,5 @@
+const { logger } = require('../utils/logger');
+
 const errorHandler = (err, req, res, next) => {
   let statusCode =
     err.statusCode ||
@@ -20,8 +22,11 @@ const errorHandler = (err, req, res, next) => {
     message = `Duplicate value for field: ${field}`;
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    console.error('[Error Stack]', err.stack);
+  // Always log the error stack server-side for diagnostics (do not leak to clients).
+  if (logger && typeof logger.error === 'function') {
+    logger.error({ err }, '[Error] Unhandled exception');
+  } else {
+    console.error('[Error Stack]', err.stack || err);
   }
 
   res.status(statusCode).json({

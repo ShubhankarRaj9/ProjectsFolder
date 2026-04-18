@@ -3,6 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const Complaint = require('../models/Complaint');
 const asyncHandler = require('express-async-handler');
+const { logger } = require('../utils/logger');
 
 
 const mapComplaintResponse = (complaint) => ({
@@ -48,17 +49,19 @@ exports.submitComplaint = asyncHandler(async (req, res) => {
 
   if (req.file) {
     const allowedTypes = ['image/jpeg', 'image/png', 'application/pdf'];
-    const maxSize = 2 * 1024 * 1024; 
+    const maxSize = 2 * 1024 * 1024;
 
     if (!allowedTypes.includes(req.file.mimetype) || req.file.size > maxSize) {
-     
-      fs.unlink(path.resolve(filePath), () => {});
+
+      fs.unlink(path.resolve(filePath), (err) => {
+        if (err) logger && logger.error && logger.error('Error removing invalid upload', err);
+      });
       return res.status(400).json({ message: 'Invalid file type or file too large.' });
     }
   }
 
   const newComplaint = new Complaint({
-    student: req.user.id,
+    student: req.user._id,
     title,
     description,
     category,
@@ -80,8 +83,7 @@ exports.getAdminDashboardData = asyncHandler(async (req, res) => {
   const totalComplaints = await Complaint.countDocuments();
   const solvedComplaints = await Complaint.countDocuments({ status: 'resolved' });
   const unresolvedComplaints = await Complaint.countDocuments({ status: 'unresolved' });
-
-  console.log('[Admin Dashboard Debug] Complaint counts:', {
+  logger && logger.info && logger.info('[Admin Dashboard] Complaint counts', {
     total: totalComplaints,
     solved: solvedComplaints,
     unresolved: unresolvedComplaints
@@ -102,8 +104,8 @@ exports.getAdminDashboardData = asyncHandler(async (req, res) => {
     .select('title description createdAt category student resolvedBy resolutionNotes status')
     .lean()).map(complaint => mapComplaintResponse(complaint));
 
-  console.log('[Admin Dashboard Debug] Unresolved complaints found:', recentUnresolvedComplaints.length);
-  console.log('[Admin Dashboard Debug] Resolved complaints found:', recentResolvedComplaints.length);
+  logger && logger.info && logger.info('[Admin Dashboard] Unresolved complaints found', { count: recentUnresolvedComplaints.length });
+  logger && logger.info && logger.info('[Admin Dashboard] Resolved complaints found', { count: recentResolvedComplaints.length });
 
   res.json({
     counts: {
@@ -138,7 +140,7 @@ exports.resolveComplaint = asyncHandler(async (req, res) => {
   }
 
   complaint.status = 'resolved';
-  complaint.resolvedBy = req.user.id;
+  complaint.resolvedBy = req.user._id;
   complaint.resolutionNotes = resolutionNotes || '';
   await complaint.save();
 
@@ -153,7 +155,7 @@ exports.getMyComplaints = asyncHandler(async (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
   const skip = (page - 1) * limit;
 
-  const filter = { student: req.user.id };
+  const filter = { student: req.user._id };
   if (req.query.status) {
     filter.status = req.query.status;
   }
@@ -187,14 +189,14 @@ exports.deleteComplaint = asyncHandler(async (req, res) => {
   }
 
   // Check if user is admin or the owner of the complaint
-  if (req.user.role !== 'admin' && complaint.student.toString() !== req.user.id) {
+  if (req.user.role !== 'admin' && complaint.student.toString() !== req.user._id.toString()) {
     return res.status(403).json({ message: 'Access denied' });
   }
 
   // Delete associated file if exists
   if (complaint.filePath) {
     fs.unlink(path.resolve(complaint.filePath), (err) => {
-      if (err) console.log('Error deleting file:', err);
+      if (err) logger && logger.error && logger.error('Error deleting file:', err);
     });
   }
 
