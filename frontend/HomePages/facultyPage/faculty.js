@@ -1,5 +1,5 @@
 // Make functions globally accessible first
-window.showCategories = function() {
+window.showCategories = function () {
 
     document.getElementById('categories-section').style.display = 'block';
     document.getElementById('complaint-list').style.display = 'none';
@@ -16,18 +16,18 @@ window.showCategories = function() {
 
 
 
-window.showMyComplaints = function() {
+window.showMyComplaints = function () {
     // Hide complaint form and categories
     const complaintForm = document.getElementById('complaint-form');
     if (complaintForm) complaintForm.style.display = 'none';
-    
+
     document.getElementById('categories-section').style.display = 'none';
     document.getElementById('complaint-list').style.display = 'block';
-    
+
     // Update nav buttons
     document.getElementById('categories-btn').classList.remove('active');
     document.getElementById('my-complaints-btn').classList.add('active');
-    
+
     // Reload complaints
     loadMyComplaints();
 };
@@ -36,47 +36,57 @@ window.showMyComplaints = function() {
 
 
 
-window.showComplaintSection = function(category) {
+window.showComplaintSection = function (category) {
     // Hide all content sections
     document.getElementById('categories-section').style.display = 'none';
     document.getElementById('complaint-list').style.display = 'none';
-    
+
     // Create and show complaint form for the selected category
     const form = createComplaintForm(category);
     const contentDiv = document.getElementById('complaint-form') || createContentDiv();
     contentDiv.innerHTML = form;
     contentDiv.style.display = 'block';
+    // Attach handlers for the injected form/back button (avoid inline <script>)
+    const injectedForm = contentDiv.querySelector('#faculty-active-complaint-form');
+    if (injectedForm) {
+        injectedForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+            submitComplaint(e, category);
+        });
+    }
 
+    const backBtn = contentDiv.querySelector('.back-button');
+    if (backBtn) backBtn.addEventListener('click', showCategories);
 };
 
 
 
 
 
-window.submitComplaint = async function(event, category) {
+window.submitComplaint = async function (event, category) {
     event.preventDefault();
     try {
-            const title = document.getElementById('title').value;
-            const description = document.getElementById('description').value;
-            const file = document.getElementById('file').files[0];
-    
-    
-            const formData = new FormData();
-            formData.append('title', title);
-            formData.append('description', description);
-            formData.append('category', category);
+        const title = document.getElementById('title').value;
+        const description = document.getElementById('description').value;
+        const file = document.getElementById('file').files[0];
+
+
+        const formData = new FormData();
+        formData.append('title', title);
+        formData.append('description', description);
+        formData.append('category', category);
         if (file) formData.append('file', file);
-        
+
         console.log('Submitting complaint:', { title, description, category, file });
-        
+
         await complaintAPI.submit(formData);
-        showMessage('Complaint submitted successfully!','success');
-        
+        showMessage('Complaint submitted successfully!', 'success');
+
         // Show my complaints after successful submission
-        showMyComplaints();   
-    } 
+        showMyComplaints();
+    }
     catch (error) {
-        alert('Error submitting complaint: ' + (error.message ||error));
+        alert('Error submitting complaint: ' + (error.message || error));
     }
 };
 
@@ -84,12 +94,12 @@ window.submitComplaint = async function(event, category) {
 
 
 
-window.deleteComplaint = async function(complaintId) {
+window.deleteComplaint = async function (complaintId) {
     if (!confirm('Are you sure you want to delete this complaint?')) return;
     try {
         await complaintAPI.deleteComplaint(complaintId);
-        loadMyComplaints(); 
-    } 
+        loadMyComplaints();
+    }
     catch (error) {
         alert('Error deleting complaint: ' + (error.message || error));
     }
@@ -99,14 +109,14 @@ window.deleteComplaint = async function(complaintId) {
 
 
 
-window.logout = function() {
+window.logout = function () {
     // Clear all user data from localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('userRole');
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     localStorage.removeItem('authToken');
-    
+
     // Redirect to login page
     window.location.href = '../../logInPage/login.html';
 };
@@ -117,23 +127,37 @@ window.logout = function() {
 
 
 // Faculty Dashboard functionality
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Check authentication and role
     const token = localStorage.getItem('token') || localStorage.getItem('authToken');
     const userRole = localStorage.getItem('userRole');
-    
+
     if (!token || userRole !== 'faculty') {
         window.location.href = '../../logInPage/login.html';
         return;
     }
     // Load initial data
     showCategories();
-    
+
     // Set user name in header
     const userName = localStorage.getItem('userName');
     if (userName) {
         document.querySelector('.header h1').textContent = `Faculty Dashboard - ${userName}`;
     }
+
+    // Attach logout and nav listeners
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+    const categoriesBtn = document.getElementById('categories-btn');
+    const myComplaintsBtn = document.getElementById('my-complaints-btn');
+    if (categoriesBtn) categoriesBtn.addEventListener('click', showCategories);
+    if (myComplaintsBtn) myComplaintsBtn.addEventListener('click', showMyComplaints);
+
+    // Attach category-card listeners
+    document.querySelectorAll('.category-card[data-category]').forEach(card => {
+        card.addEventListener('click', () => showComplaintSection(card.getAttribute('data-category')));
+    });
 });
 
 
@@ -163,12 +187,12 @@ async function loadMyComplaints() {
         const complaints = response.complaints;
         console.log('Complaints data:', complaints);
         const container = document.getElementById('complaints-container');
-        
-        if (!Array.isArray(complaints)||complaints.length === 0) {
+
+        if (!Array.isArray(complaints) || complaints.length === 0) {
             container.innerHTML = '<p style="text-align: center; color: #666; padding: 2rem;">No complaints found. Click "Submit Complaint" to create your first complaint.</p>';
             return;
         }
-        
+
         container.innerHTML = `<div class="complaints-grid">${complaints.map(complaint => `
             <div class="complaint-card">
                 <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
@@ -180,7 +204,7 @@ async function loadMyComplaints() {
                         </div>
                         <p style="color: #666; font-size: 0.875rem; margin: 0;">${new Date(complaint.createdAt).toLocaleDateString()}</p>
                     </div>
-                    <button onclick="deleteComplaint('${complaint._id}')" style="background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;">Delete</button>
+                    <button class="delete-btn" data-id="${complaint._id}" style="background: #ef4444; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer; font-size: 0.875rem;">Delete</button>
                 </div>
                 <div style="background: #f8f9fa; padding: 1rem; border-radius: 0.25rem; margin-bottom: 1rem;">
                     <p style="margin: 0; color: var(--text-primary); line-height: 1.5;">${complaint.description}</p>
@@ -189,6 +213,14 @@ async function loadMyComplaints() {
                 ${complaint.adminResponse ? `<div style="background: #e0f2fe; padding: 1rem; border-radius: 0.25rem; margin-top: 1rem; border-left: 3px solid #0288d1;"><strong style="color: #0277bd;">Admin Response:</strong><p style="margin: 0.5rem 0 0 0; color: #01579b;">${complaint.adminResponse}</p></div>` : ''}
             </div>
         `).join('')}</div>`;
+
+        // Attach delete handlers
+        container.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const id = btn.getAttribute('data-id');
+                deleteComplaint(id);
+            });
+        });
     } catch (error) {
         console.error('Error loading complaints:', error);
         document.getElementById('complaints-container').innerHTML = '<p style="color: #ef4444; text-align: center; padding: 2rem;">Error loading complaints. Please try again.</p>';
@@ -202,7 +234,7 @@ async function loadMyComplaints() {
 // Delete resolved complaint
 async function deleteComplaint(complaintId) {
     if (!confirm('Are you sure you want to delete this complaint?')) return;
-    
+
     try {
         await complaintAPI.deleteComplaint(complaintId);
         loadMyComplaints(); // Refresh the list
@@ -242,9 +274,9 @@ function createComplaintForm(category) {
         <div style="background: var(--bg-secondary); padding: 2rem; border-radius: 0.5rem; box-shadow: var(--shadow); margin: 1rem 0;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
                 <h2 style="color: var(--text-primary); margin: 0;">Submit ${category} Complaint</h2>
-                <button onclick="showCategories()" style="background: var(--secondary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Back to Categories</button>
+                <button type="button" class="back-button" style="background: var(--secondary-color); color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">Back to Categories</button>
             </div>
-            <form onsubmit="submitComplaint(event, '${category}')" style="display: flex; flex-direction: column; gap: 1rem;">
+            <form id="faculty-active-complaint-form" style="display: flex; flex-direction: column; gap: 1rem;">
                 <div>
                     <label for="title" style="display: block; margin-bottom: 0.5rem; color: var(--text-primary); font-weight: 500;">Title:</label>
                     <input type="text" id="title" name="title" required style="width: 100%; padding: 0.75rem; border: 1px solid #ddd; border-radius: 0.25rem; font-size: 1rem;">

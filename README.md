@@ -130,6 +130,33 @@ A full-stack web application for managing student complaints in an educational i
    # Open index.html in VS Code and use Live Server extension
    ```
 
+## Verify Backend and Frontend
+
+Before running or pushing changes, verify both parts locally to make sure everything works together:
+
+- **Backend** (quick check):
+   - Change into the backend folder: `cd backend`
+   - Install dependencies: `npm install`
+   - Ensure you have a `.env` file with `PORT`, `DATABASE_URL`, and `JWT_SECRET` set.
+   - Start the server: `npm run dev` (or `node server.js`)
+   - Confirm the server is responding (replace port with your `PORT`):
+      ```bash
+      curl http://localhost:3000/
+      # or check a health endpoint if available, e.g.:
+      curl http://localhost:3000/api/health
+      ```
+
+- **Frontend** (quick check):
+   - Open the frontend files in a browser or serve using VS Code Live Server.
+   - Make sure the API base URL in `frontend/apis/api.js` points to the running backend (e.g. `http://localhost:3000`).
+   - Open pages such as `frontend/logInPage/login.html` or `frontend/SignInPage/SignIn.html` and verify assets and API calls load correctly.
+
+- **Quick sanity checks**:
+   - From repo root run `git status` to confirm the folder is a git repo.
+   - Confirm backend logs print a listening message when starting `npm run dev`.
+   - Try logging in from the frontend to confirm end-to-end connectivity.
+
+
 ## API Endpoints
 
 ### Authentication

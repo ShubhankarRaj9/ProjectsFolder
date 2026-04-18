@@ -37,6 +37,20 @@ window.resolveComplaint = async function(complaintId) {
             messageDiv.remove();
             loadComplaints(currentFilter); // Refresh current view
         }, 2000);
+        // Attach action handlers for resolve/delete (if rendering occurred)
+        const complaintsDivEl = document.getElementById('complaints-list');
+        if (complaintsDivEl) {
+            const actionBtns = complaintsDivEl.querySelectorAll('.complaint-actions .btn');
+            actionBtns.forEach(b => {
+                b.addEventListener('click', () => {
+                    const id = b.dataset.id;
+                    const action = b.dataset.action;
+                    if (action === 'resolve') resolveComplaint(id);
+                    else if (action === 'delete') deleteComplaint(id);
+                });
+            });
+        }
+
     } catch (error) {
         // Show error message
         const messageDiv = document.createElement('div');
@@ -110,6 +124,16 @@ document.addEventListener('DOMContentLoaded', function() {
     if (userName) {
         document.querySelector('.header h1').textContent = `Admin Dashboard - ${userName}`;
     }
+    // Attach navigation button listeners (avoid inline onclicks)
+    const pendingBtn = document.getElementById('pending-btn');
+    const resolvedBtn = document.getElementById('resolved-btn');
+    const allBtn = document.getElementById('all-btn');
+    if (pendingBtn) pendingBtn.addEventListener('click', () => { currentFilter = 'pending'; updateNavButtons('pending-btn'); loadComplaints('pending'); });
+    if (resolvedBtn) resolvedBtn.addEventListener('click', () => { currentFilter = 'resolved'; updateNavButtons('resolved-btn'); loadComplaints('resolved'); });
+    if (allBtn) allBtn.addEventListener('click', () => { currentFilter = 'all'; updateNavButtons('all-btn'); loadComplaints('all'); });
+
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
 });
 
 // Check if user is authenticated as admin
@@ -190,13 +214,13 @@ async function loadComplaints(filter = 'pending') {
                         <p><strong>Resolved:</strong> ${new Date(complaint.resolvedAt).toLocaleDateString()}</p>
                     ` : ''}
                     <div class="complaint-actions">
-                        ${complaint.status === 'unresolved' ? `
-                            <button class="btn pending" onClick="resolveComplaint('${complaint._id}')">Resolve Now</button>
-                            <button class="btn delete" onClick="deleteComplaint('${complaint._id}')">Delete</button>
-                        ` : `
-                            <button class="btn resolve" disabled>Resolved</button>
-                            <button class="btn delete" onClick="deleteComplaint('${complaint._id}')">Delete</button>
-                        `}
+                                ${complaint.status === 'unresolved' ? `
+                                    <button class="btn pending" data-action="resolve" data-id="${complaint._id}">Resolve Now</button>
+                                    <button class="btn delete" data-action="delete" data-id="${complaint._id}">Delete</button>
+                                ` : `
+                                    <button class="btn resolve" disabled>Resolved</button>
+                                    <button class="btn delete" data-action="delete" data-id="${complaint._id}">Delete</button>
+                                `}
                     </div>
                 </div>
             `;

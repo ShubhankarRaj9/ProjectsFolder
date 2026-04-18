@@ -1,49 +1,50 @@
-// complaintForm.js
+// complaintForm.js — attach listeners when the template/form is present
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('active-complaint-form');
+    const backBtn = document.querySelector('.btn-back');
 
-// Template ko cache karne ke liye variable
-let complaintFormTemplate = null;
-
-// Function jo template ko fetch karke DOM mein daalti hai
-export async function renderComplaintForm(category) {
-    const SUBMIT_FORM_CONTAINER_ID = 'submit-complaint-form';
-    const formContainer = document.getElementById(SUBMIT_FORM_CONTAINER_ID);
-
-    if (!formContainer) {
-        console.error(`ERROR: HTML element with ID "${SUBMIT_FORM_CONTAINER_ID}" not found.`);
-        return;
-    }
-    
-    // 1. Template ko fetch karna (Sirf pehli baar)
-    if (complaintFormTemplate === null) {
-        try {
-            const response = await fetch('complaintFormTemplate.html'); // File ka naam use kiya
-            if (!response.ok) throw new Error('Template file not found');
-            complaintFormTemplate = await response.text();
-        } catch (error) {
-            formContainer.innerHTML = `<p style="color:red;">Error loading form template: ${error.message}</p>`;
-            formContainer.style.display = 'block';
-            return;
-        }
+    if (backBtn) {
+        backBtn.addEventListener('click', function () {
+            if (typeof showCategories === 'function') showCategories();
+            else window.location.href = '/HomePages/studentPage/student.html';
+        });
     }
 
-    // 2. HTML ko DOM mein inject karna
-    formContainer.innerHTML = complaintFormTemplate;
-    
-    // 3. Category ke hisaab se dynamic data daalna
-    document.getElementById('complaint-form-title').textContent = `Submit ${category} Complaint`;
-    document.getElementById('active-complaint-form').dataset.category = category; // Submission ke liye category store karna
-    
-    // 4. Container ko show karna
-    formContainer.style.display = 'block';
-}
+    if (form) {
+        form.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const category = form.dataset.category || '';
 
+            try {
+                const title = form.querySelector('#title') ? form.querySelector('#title').value : '';
+                const description = form.querySelector('#description') ? form.querySelector('#description').value : '';
+                const fileInput = form.querySelector('#file');
+                const file = fileInput && fileInput.files ? fileInput.files[0] : null;
 
-// --- (The submission logic remains here) ---
+                const formData = new FormData();
+                formData.append('title', title);
+                formData.append('description', description);
+                formData.append('category', category);
+                if (file) formData.append('file', file);
 
-// Function to handle the form submission logic
-async function submitComplaint(event, category) {
-    // ... (Your existing submission logic) ...
-}
+                await complaintAPI.submit(formData);
+                // feedback
+                const msg = document.createElement('div');
+                msg.className = 'success-message';
+                msg.textContent = 'Complaint submitted successfully!';
+                document.body.appendChild(msg);
+                setTimeout(() => { msg.remove(); }, 2000);
 
-// Submission logic ko globally attach karna
-window.submitComplaint = submitComplaint;
+                // try to show complaints list if available
+                if (typeof loadMyComplaints === 'function') loadMyComplaints();
+                if (typeof showMyComplaints === 'function') showMyComplaints();
+            } catch (err) {
+                const msg = document.createElement('div');
+                msg.className = 'error-message';
+                msg.textContent = 'Error submitting complaint: ' + (err.message || err);
+                document.body.appendChild(msg);
+                setTimeout(() => { msg.remove(); }, 3000);
+            }
+        });
+    }
+});

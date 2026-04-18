@@ -1,5 +1,8 @@
 // API Configuration and Authentication
-const API_BASE_URL = 'http://localhost:3000/api';
+// Use same-origin API path when frontend is served by backend; falls back to origin-based path.
+const API_BASE_URL = (typeof window !== 'undefined' && window.location && window.location.origin)
+    ? `${window.location.origin}/api`
+    : 'http://localhost:3000/api';
 
 // Token management
 const getToken = () => localStorage.getItem('token') || localStorage.getItem('authToken');
@@ -19,21 +22,25 @@ const removeToken = () => {
 // API request helper
 const apiRequest = async (endpoint, options = {}) => {
     const token = getToken();
+    const isForm = options.body instanceof FormData;
+    const headers = {
+        ...(isForm ? {} : { 'Content-Type': 'application/json' }),
+        ...(token ? { 'Authorization': `Bearer ${token}`, 'x-auth-token': token } : {}),
+        ...options.headers,
+    };
+
     const config = {
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token && { 'x-auth-token': token }),
-            ...options.headers,
-        },
+        credentials: 'include', // send cookies (refresh token) when same-origin or CORS with credentials
+        headers,
         ...options,
     };
-    if (options.body instanceof FormData) {
-        delete config.headers['Content-Type']; // Let browser set it for FormData
-    }
+
+    if (isForm) delete config.headers['Content-Type'];
 
     try {
         const response = await fetch(`${API_BASE_URL}${endpoint}`, config);
-        const data = await response.json();
+        let data = {};
+        try { data = await response.json(); } catch (e) { data = {}; }
 
         if (!response.ok) {
             throw new Error(data.message || 'API request failed');
@@ -83,36 +90,18 @@ const authAPI = {
 
     logout: () => {
         removeToken();
-        window.location.href = '../logInPage/login.html';
+        window.location.href = '/logInPage/login.html';
     }
 };
 
 // Complaint API calls
 const complaintAPI = {
     submit: async (formData) => {
-        const token = getToken();
-        const response = await fetch(`${API_BASE_URL}/complaints/submit`, {
+        // Use the central apiRequest helper so cookies, headers and error handling are consistent.
+        return await apiRequest('/complaints/submit', {
             method: 'POST',
-            headers: {
-                'x-auth-token': token,
-            },
-            body: formData, // FormData for file upload
+            body: formData,
         });
-
-        let data;
-
-        try {
-            data = await response.json();
-        } catch {
-            data = {};
-        }
-
-        if (!response.ok) {
-            console.error("Server response:", data);
-            throw new Error(data.message || 'Failed to submit complaint');
-        }
-
-        return data;
     },
 
     getMyComplaints: async (page = 1, limit = 10, status = '') => {

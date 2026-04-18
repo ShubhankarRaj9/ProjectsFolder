@@ -1,38 +1,107 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>LogIn - Page</title>
-    <link rel="stylesheet" href="login.css">
-</head>
-<body class="LogIn-page">
+    <!-- Bootstrap for quick, responsive UI -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="login.css" />
+    <style>
+      /* small enhancements to blend with Bootstrap */
+      body.LogIn-page {
+        background: linear-gradient(135deg, #f8fafc, #eaf2ff);
+      }
+      .LogIn-box {
+        padding: 2rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 6px 18px rgba(34, 41, 47, 0.08);
+        background: white;
+      }
+      .LogIn-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .LogIn-box h2 {
+        margin-bottom: 0.25rem;
+      }
+      .LogIn-box p {
+        color: #6b7280;
+        margin-bottom: 1rem;
+      }
+      .LogIn-box input,
+      .LogIn-box select {
+        margin-bottom: 0.75rem;
+      }
+      .btn-primary {
+        background: linear-gradient(90deg, #0d6efd, #4f46e5);
+        border: none;
+      }
+    </style>
+  </head>
+  <body class="LogIn-page">
     <div class="LogIn-container">
-        <div class="LogIn-box">
-            <h2>Login</h2>
-            <p>Access your complaint portal</p>
-            
-            <div id="message"></div>
-            
-            <form id="loginForm" onsubmit="return false;">
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="password" id="password" placeholder="Password" required>
-                <select id="role" required>
-                    <option value="">Select Role</option>
-                    <option value="student">Student</option>
-                    <option value="faculty">Faculty</option>
-                    <option value="admin">Admin</option>
-                </select>
-                <button type="button" onclick="handleLogin(event)">Login</button>
-            </form>
-            
-            <div style="text-align: center; margin-top: 1rem;">
-                <p>Don't have an account? <a href="../SignInPage/SignIn.html" style="color: var(--primary-color); text-decoration: none;">Register here</a></p>
-            </div>
+      <div class="LogIn-box col-11 col-sm-8 col-md-5 col-lg-4">
+        <h2 class="fw-bold">Welcome Back</h2>
+        <p>Sign in to the complaint portal</p>
+
+        <div id="message"></div>
+
+        <form id="loginForm">
+          <div class="mb-3">
+            <label for="email" class="form-label">Email</label>
+            <input
+              type="email"
+              class="form-control"
+              id="email"
+              placeholder="you@institute.edu"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="password" class="form-label">Password</label>
+            <input
+              type="password"
+              class="form-control"
+              id="password"
+              placeholder="••••••••"
+              required
+            />
+          </div>
+
+          <div class="mb-3">
+            <label for="role" class="form-label">Role</label>
+            <select id="role" class="form-select" required>
+              <option value="">Select Role</option>
+              <option value="student">Student</option>
+              <option value="faculty">Faculty</option>
+              <option value="admin">Admin</option>
+            </select>
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-primary" type="submit" id="loginBtn">
+              Login
+            </button>
+          </div>
+        </form>
+
+        <div class="text-center mt-3">
+          <small
+            >Don't have an account?
+            <a href="/SignInPage/SignIn.html">Register here</a></small
+          >
         </div>
+      </div>
     </div>
 
     <script src="../apis/api.js"></script>
     <script src="logIn.js"></script>
-</body>
+  </body>
 </html>

@@ -3,28 +3,46 @@ const CATEGORIES_SECTION_ID = 'categories-section';
 const COMPLAINT_LIST_ID = 'complaint-list';
 
 // Check authentication when the page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Check authentication and role
     const token = localStorage.getItem('token') || localStorage.getItem('authToken');
     const userRole = localStorage.getItem('userRole');
-    
+
     if (!token || userRole !== 'student') {
-        window.location.href = '../../logInPage/login.html';
+        window.location.href = '/logInPage/login.html';
         return;
     }
-    
+
     // Set user name in header if available
     const userName = localStorage.getItem('userName');
     if (userName) {
         document.querySelector('.header h1').textContent = `Student Dashboard - ${userName}`;
     }
-    
+
     // Show initial view
     showCategories();
+
+    // Attach logout listener
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) logoutBtn.addEventListener('click', logout);
+
+    // Attach nav listeners
+    const categoriesBtn = document.getElementById('categories-btn');
+    const myComplaintsBtn = document.getElementById('my-complaints-btn');
+    if (categoriesBtn) categoriesBtn.addEventListener('click', showCategories);
+    if (myComplaintsBtn) myComplaintsBtn.addEventListener('click', showMyComplaints);
+
+    // Attach category-card listeners
+    document.querySelectorAll('.category-card[data-category]').forEach(card => {
+        card.addEventListener('click', () => {
+            const category = card.getAttribute('data-category');
+            showComplaintSection(category);
+        });
+    });
 });
 
 
-window.showCategories = function() {
+window.showCategories = function () {
     // Hide other sections
     document.getElementById(COMPLAINT_LIST_ID).style.display = 'none';
     document.getElementById(SUBMIT_FORM_CONTAINER_ID).style.display = 'none';
@@ -38,7 +56,7 @@ window.showCategories = function() {
 };
 
 
-window.showMyComplaints = function() {
+window.showMyComplaints = function () {
     // Hide categories and form
     document.getElementById(CATEGORIES_SECTION_ID).style.display = 'none';
     document.getElementById(SUBMIT_FORM_CONTAINER_ID).style.display = 'none';
@@ -55,23 +73,36 @@ window.showMyComplaints = function() {
 };
 
 
-window.showComplaintSection = function(category) {
+window.showComplaintSection = function (category) {
     // 1. Hide categories and list
     document.getElementById(CATEGORIES_SECTION_ID).style.display = 'none';
     document.getElementById(COMPLAINT_LIST_ID).style.display = 'none';
-    
+
     // 2. Get the existing form container from HTML
     const formContainer = document.getElementById(SUBMIT_FORM_CONTAINER_ID);
 
     // 3. Update its content with the dynamic form HTML
     if (formContainer) {
-        // You should define 'createComplaintForm' separately (it's already defined below)
+        // Insert form markup
         formContainer.innerHTML = createComplaintForm(category);
-        
-        // 4. Update the form title text
-        document.getElementById('complaint-form-title').textContent = `Submit Complaint: ${category}`;
-        
-        // 5. Show the container
+
+        // Update the form title if present
+        const titleEl = formContainer.querySelector('#complaint-form-title');
+        if (titleEl) titleEl.textContent = `Submit Complaint: ${category}`;
+
+        // Attach form submit and back-button listeners (CSP-friendly)
+        const activeForm = formContainer.querySelector('#active-complaint-form');
+        if (activeForm) {
+            activeForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                submitComplaint(e, category);
+            });
+        }
+
+        const backBtn = formContainer.querySelector('.back-button');
+        if (backBtn) backBtn.addEventListener('click', showCategories);
+
+        // Show the container
         formContainer.style.display = 'block';
     } else {
         console.error(`ERROR: HTML element with ID "${SUBMIT_FORM_CONTAINER_ID}" not found.`);
@@ -84,15 +115,15 @@ window.showComplaintSection = function(category) {
 };
 
 
-window.submitComplaint = async function(event, category) {
+window.submitComplaint = async function (event, category) {
     event.preventDefault();
-    
+
     try {
         const title = document.getElementById('title').value;
         const description = document.getElementById('description').value;
         const fileInput = document.getElementById('file');
         const file = fileInput.files[0];
-        
+
         const formData = new FormData();
         formData.append('title', title);
         formData.append('description', description);
@@ -100,29 +131,29 @@ window.submitComplaint = async function(event, category) {
         if (file) formData.append('file', file);
 
         console.log('Submitting complaint:', { title, description, category });
-        
+
         await complaintAPI.submit(formData);
-        
+
         // Show success message
         const messageDiv = document.createElement('div');
         messageDiv.className = 'success-message';
         messageDiv.textContent = 'Complaint submitted successfully!';
         document.body.appendChild(messageDiv);
-        
+
         setTimeout(() => {
             messageDiv.remove();
-           showMyComplaints(); // Show complaints list after submission
+            showMyComplaints(); // Show complaints list after submission
         }, 2000);
-        
+
     } catch (error) {
         console.error('Submission error:', error);
-        
+
         // Show error message
         const messageDiv = document.createElement('div');
         messageDiv.className = 'error-message';
         messageDiv.textContent = 'Error submitting complaint: ' + (error.message || error);
         document.body.appendChild(messageDiv);
-        
+
         setTimeout(() => {
             messageDiv.remove();
         }, 3000);
@@ -133,11 +164,11 @@ window.submitComplaint = async function(event, category) {
 function createComplaintForm(category) {
     return `
         <div class="complaint-form-container">
-            <div class="form-header">
+            <div class="form-header" style="display:flex; justify-content:space-between; align-items:center;">
                 <h2 id="complaint-form-title">Submit ${category} Complaint</h2>
-                <button type="button" onclick="showCategories()" class="back-button">Back to Categories</button>
+                <button type="button" class="back-button">Back to Categories</button>
             </div>
-            <form id="active-complaint-form" onsubmit="window.submitComplaint(event, '${category}')">
+            <form id="active-complaint-form">
                 <div class="form-group">
                     <label for="title">Title:</label>
                     <input type="text" id="title" name="title" required placeholder="Enter complaint title">
@@ -165,12 +196,12 @@ async function loadMyComplaints() {
     try {
         const container = document.getElementById('complaints-container');
         container.innerHTML = 'Loading...';
-        
-    const response = await complaintAPI.getMyComplaints();
-    console.log('Loaded complaints response:', response); // Debug log
-    const complaints = (response && response.complaints) || [];
 
-    if (!Array.isArray(complaints) || complaints.length === 0) {
+        const response = await complaintAPI.getMyComplaints();
+        console.log('Loaded complaints response:', response); // Debug log
+        const complaints = (response && response.complaints) || [];
+
+        if (!Array.isArray(complaints) || complaints.length === 0) {
             container.innerHTML = `
                 <div class="no-complaints">
                     <h3>No complaints found</h3>
@@ -191,7 +222,7 @@ async function loadMyComplaints() {
                         </div>
                         <p class="date">Submitted on: ${new Date(complaint.createdAt).toLocaleDateString()}</p>
                     </div>
-                    <button onclick="deleteComplaint('${complaint._id}')" class="delete-btn">Delete</button>
+                    <button class="delete-btn" data-id="${complaint._id}">Delete</button>
                 </div>
                 <div class="complaint-body">
                     <p>${complaint.description}</p>
@@ -212,6 +243,11 @@ async function loadMyComplaints() {
             </div>
         `).join('');
 
+        // Attach delete listeners
+        container.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', () => deleteComplaint(btn.dataset.id));
+        });
+
     } catch (error) {
         console.error('Error loading complaints:', error);
         document.getElementById('complaints-container').innerHTML = `
@@ -224,30 +260,30 @@ async function loadMyComplaints() {
 
 async function deleteComplaint(complaintId) {
     if (!confirm('Are you sure you want to delete this complaint?')) return;
-    
+
     try {
         await complaintAPI.deleteComplaint(complaintId);
-        
+
         // Show success message
         const messageDiv = document.createElement('div');
         messageDiv.className = 'success-message';
         messageDiv.textContent = 'Complaint deleted successfully!';
         document.body.appendChild(messageDiv);
-        
+
         setTimeout(() => {
             messageDiv.remove();
             loadMyComplaints(); // Reload the list
         }, 2000);
-        
+
     } catch (error) {
         console.error('Error deleting complaint:', error);
-        
+
         // Show error message
         const messageDiv = document.createElement('div');
         messageDiv.className = 'error-message';
         messageDiv.textContent = 'Error deleting complaint: ' + (error.message || error);
         document.body.appendChild(messageDiv);
-        
+
         setTimeout(() => {
             messageDiv.remove();
         }, 3000);
@@ -262,5 +298,5 @@ function logout() {
     localStorage.removeItem('userId');
     localStorage.removeItem('userName');
     // Redirect to login page
-    window.location.href = '../../logInPage/login.html';
+    window.location.href = '/logInPage/login.html';
 }
