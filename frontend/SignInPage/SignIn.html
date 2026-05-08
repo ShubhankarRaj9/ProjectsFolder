@@ -4,21 +4,26 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SignIn Page</title>
+
     <link
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+
     <link rel="stylesheet" href="SignIn.css" />
+
     <style>
       body.SignIn-page {
         background: linear-gradient(135deg, #f8fafc, #eaf2ff);
       }
+
       .SignIn-box {
         padding: 2rem;
         border-radius: 0.75rem;
         box-shadow: 0 6px 18px rgba(34, 41, 47, 0.08);
         background: white;
       }
+
       .SignIn-container {
         min-height: 100vh;
         display: flex;
@@ -27,10 +32,12 @@
       }
     </style>
   </head>
+
   <body class="SignIn-page">
     <div class="SignIn-container">
       <div class="SignIn-box">
         <h2>Register</h2>
+
         <p>Create your account to access the complaint portal</p>
 
         <div id="message"></div>
@@ -38,6 +45,7 @@
         <form id="registerForm">
           <div class="mb-3">
             <label class="form-label">Full Name</label>
+
             <input
               type="text"
               id="name"
@@ -46,8 +54,10 @@
               required
             />
           </div>
+
           <div class="mb-3">
             <label class="form-label">Email</label>
+
             <input
               type="email"
               id="email"
@@ -56,8 +66,10 @@
               required
             />
           </div>
+
           <div class="mb-3">
             <label class="form-label">Password</label>
+
             <input
               type="password"
               id="password"
@@ -66,8 +78,10 @@
               required
             />
           </div>
+
           <div class="mb-3">
             <label class="form-label">Confirm Password</label>
+
             <input
               type="password"
               id="confirmPassword"
@@ -76,24 +90,10 @@
               required
             />
           </div>
-          <div class="d-grid">
-            <button class="btn btn-primary" type="submit" id="registerBtn">
-              Register
-            </button>
-          </div>
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Confirm Password</label>
-            <input
-              type="password"
-              id="confirmPassword"
-              class="form-control"
-              placeholder="••••••"
-              required
-            />
-          </div>
+
           <div class="mb-3">
             <label class="form-label">Role</label>
+
             <select id="role" class="form-select" required>
               <option value="">Select Role</option>
               <option value="student">Student</option>
@@ -101,17 +101,28 @@
               <option value="admin">Admin</option>
             </select>
           </div>
-          <!-- duplicate register button removed; form uses submit button above -->
+
+          <div class="d-grid">
+            <button
+              class="btn btn-primary"
+              type="submit"
+              id="registerBtn"
+            >
+              Register
+            </button>
+          </div>
         </form>
 
         <div style="text-align: center; margin-top: 1rem">
           <p>
             Already have an account?
+
             <a
               href="../logInPage/login.html"
               style="color: var(--primary-color); text-decoration: none"
-              >Login here</a
             >
+              Login here
+            </a>
           </p>
         </div>
       </div>
